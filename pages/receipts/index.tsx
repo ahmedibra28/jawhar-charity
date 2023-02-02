@@ -14,6 +14,7 @@ import {
 import {
   AutoCompleteInput,
   DynamicFormProps,
+  inputCheckBox,
   inputDate,
   inputNumber,
   inputTextArea,
@@ -106,6 +107,7 @@ const Receipts = () => {
   const editHandler = (item: ITransaction | any) => {
     setId(item._id)
     setValue('account', item?.account)
+    setValue('isPaid', item?.isPaid)
     setValue('donor', item?.donor?._id)
     setValue('totalAmount', item?.amount)
     setValue('description', item?.description)
@@ -176,31 +178,32 @@ const Receipts = () => {
       } as DynamicFormProps)}
     </div>,
     <>
-      {!edit && watch().account === 'Orphans' && (
-        <>
-          <div key={2} className="col-12">
-            {inputNumber({
-              register,
-              errors,
-              label: 'Total amount',
-              name: 'totalAmount',
-              placeholder: 'Total amount',
-            } as DynamicFormProps)}
-          </div>
-          <div key={3} className="col-12">
-            {inputNumber({
-              register,
-              errors,
-              label: 'Duration',
-              name: 'duration',
-              placeholder: 'Duration',
-            } as DynamicFormProps)}
-          </div>
-        </>
-      )}
+      {(watch().account === 'Orphans' || watch().account === 'Education') &&
+        !edit && (
+          <>
+            <div key={2} className="col-12">
+              {inputNumber({
+                register,
+                errors,
+                label: 'Total amount',
+                name: 'totalAmount',
+                placeholder: 'Total amount',
+              } as DynamicFormProps)}
+            </div>
+            <div key={3} className="col-12">
+              {inputNumber({
+                register,
+                errors,
+                label: 'Duration',
+                name: 'duration',
+                placeholder: 'Duration',
+              } as DynamicFormProps)}
+            </div>
+          </>
+        )}
     </>,
     <>
-      {(watch().account !== 'Orphans' || edit) && (
+      {edit && (
         <>
           <div key={2} className="col-12">
             {inputNumber({
@@ -213,6 +216,22 @@ const Receipts = () => {
           </div>
         </>
       )}
+      {!edit &&
+        (watch().account === 'Eid' ||
+          watch().account === 'Other' ||
+          watch().account === 'Ramadan') && (
+          <>
+            <div key={2} className="col-12">
+              {inputNumber({
+                register,
+                errors,
+                label: 'Amount',
+                name: 'totalAmount',
+                placeholder: 'Amount',
+              } as DynamicFormProps)}
+            </div>
+          </>
+        )}
     </>,
 
     <div key={4} className="col-12">
@@ -234,6 +253,18 @@ const Receipts = () => {
         placeholder: 'Description',
         isRequired: false,
       } as DynamicFormProps)}
+
+      <div className="col-12">
+        {inputCheckBox({
+          register,
+          errors,
+          label: `Is ${
+            watch('donor') ? watch('donor') : 'this donor'
+          } paid in cash?`,
+          name: 'isPaid',
+          isRequired: false,
+        } as DynamicFormProps)}
+      </div>
     </div>,
   ]
 
@@ -318,7 +349,9 @@ const Receipts = () => {
               <tr>
                 <th>Donor</th>
                 <th>Account</th>
+                <th>Total Amount</th>
                 <th>Amount</th>
+                <th>Payment Status</th>
                 <th>Date</th>
                 <th>Description</th>
                 <th>Actions</th>
@@ -331,6 +364,24 @@ const Receipts = () => {
                     <td>{item?.donor?.name}</td>
                     <td>{item?.account}</td>
                     <td>{currency(item?.amount)}</td>
+                    <td>
+                      {item?.totalAmount ? (
+                        <span className="badge bg-success">
+                          {`${currency(item?.totalAmount)} for ${
+                            item?.duration
+                          } months`}
+                        </span>
+                      ) : (
+                        <span className="badge bg-danger">NA</span>
+                      )}
+                    </td>
+                    <td>
+                      {item?.isPaid ? (
+                        <span className="bg-success badge">Paid</span>
+                      ) : (
+                        <span className="bg-danger badge">Un-Paid</span>
+                      )}
+                    </td>
                     <td>{moment(item?.date).format('YYYY-MM-DD')}</td>
                     <td>{item?.description}</td>
 

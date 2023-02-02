@@ -84,7 +84,6 @@ const Home = () => {
         backgroundColor: 'rgb(225, 122, 122)',
         yAxisID: 'y',
       },
-
       {
         label: 'Orphans',
         data: getApi?.data?.chartData?.orphans,
@@ -92,14 +91,67 @@ const Home = () => {
         backgroundColor: 'rgb(134, 122, 225)',
         yAxisID: 'y1',
       },
+      {
+        label: 'Education',
+        data: getApi?.data?.chartData?.education,
+        borderColor: 'rgb(150, 113, 92)',
+        backgroundColor: 'rgb(150, 113, 92)',
+        yAxisID: 'y',
+      },
+      {
+        label: 'Other',
+        data: getApi?.data?.chartData?.other,
+        borderColor: 'rgb(241, 58, 110)',
+        backgroundColor: 'rgb(241, 58, 110)',
+        yAxisID: 'y1',
+      },
     ],
   }
 
+  const accountsBox = [
+    {
+      _id: 1,
+      name: 'Ramadan Account',
+      icon: <FaHandHoldingUsd className="mb-1 fs-1" />,
+      link: getApi?.data?.balance?.currentBalanceOnRamadanAcc,
+      color: 'rgb(122, 225, 144)',
+    },
+    {
+      _id: 2,
+      name: 'Eid Account',
+      icon: <FaHandHoldingUsd className="mb-1 fs-1" />,
+      link: getApi?.data?.balance?.currentBalanceOnEidAcc,
+      color: 'rgb(225, 122, 122)',
+    },
+    {
+      _id: 3,
+      name: 'Orphans Account',
+      icon: <FaHandHoldingUsd className="mb-1 fs-1" />,
+      link: getApi?.data?.balance?.currentBalanceOnOrphansAcc,
+      color: 'rgb(134, 122, 225)',
+    },
+    {
+      _id: 4,
+      name: 'Education Account',
+      icon: <FaHandHoldingUsd className="mb-1 fs-1" />,
+      link: getApi?.data?.balance?.currentBalanceOnEducationAcc,
+      color: 'rgb(150, 113, 92)',
+    },
+    {
+      _id: 5,
+      name: 'Other Account',
+      icon: <FaHandHoldingUsd className="mb-1 fs-1" />,
+      link: getApi?.data?.balance?.currentBalanceOnOtherAcc,
+      color: 'rgb(241, 58, 110)',
+    },
+  ]
+
   return (
     <div className="container bg-light p-3 mt-2">
+      <div className="row gy-3"></div>
       <div className="row">
-        <div className="col-lg-8 col-12 mx-auto">
-          <div className="card-text">
+        <div className="col-lg-8 col-md-12 col-12 mx-auto mb-3">
+          <div className="card-text shadow">
             {getApi?.isLoading ? (
               <Spinner />
             ) : (
@@ -107,78 +159,30 @@ const Home = () => {
             )}
           </div>
         </div>
-        <div className="col-lg-4 col-12 mx-auto ">
-          <div
-            className="card border-top-0 border-bottom-0 shadow-lg mb-2"
-            style={{ border: '5px solid rgb(122, 225, 144)' }}
-          >
-            <div className="card-body text-center pb-0">
-              <h6 className="card-title">
-                <FaHandHoldingUsd className="mb-1 fs-1" /> <br />
-                <span className="fw-bold">RAMADAN ACCOUNT</span>
-              </h6>
 
-              <div className="card-text">
-                {getApi?.isLoading ? (
-                  <Spinner />
-                ) : (
-                  <p className="fw-bold display-6">
-                    {currency(
-                      getApi?.data?.balance?.currentBalanceOnRamadanAcc
-                    )}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
+        <div className="col-lg-4 col-md-6  mx-auto">
+          {accountsBox?.map((account) => (
+            <div
+              key={account._id}
+              className="card border-top-0 border-bottom-0 shadow-lg mb-2"
+              style={{ border: `5px solid ${account.color}` }}
+            >
+              <div className="card-body text-center pb-0">
+                <h6 className="card-title">
+                  {account.icon} <br />
+                  <span className="fw-bold">{account.name}</span>
+                </h6>
 
-          <div
-            className="card border-top-0 border-bottom-0 shadow-lg mb-2"
-            style={{ border: '5px solid rgb(225, 122, 122)' }}
-          >
-            <div className="card-body text-center pb-0">
-              <h6 className="card-title">
-                <FaHandHoldingUsd className="mb-1 fs-1" /> <br />
-                <span className="fw-bold">EID ACCOUNT</span>
-              </h6>
-              <div className="card-text">
                 <div className="card-text">
                   {getApi?.isLoading ? (
                     <Spinner />
                   ) : (
-                    <p className="fw-bold display-6">
-                      {currency(getApi?.data?.balance?.currentBalanceOnEidAcc)}
-                    </p>
+                    <p className="fw-bold">{currency(account.link)}</p>
                   )}
                 </div>
               </div>
             </div>
-          </div>
-
-          <div
-            className="card border-top-0 border-bottom-0 shadow-lg mb-2"
-            style={{ border: '5px solid rgb(134, 122, 225)' }}
-          >
-            <div className="card-body text-center pb-0">
-              <h6 className="card-title">
-                <FaHandHoldingUsd className="mb-1 fs-1" /> <br />
-                <span className="fw-bold">ORPHANS ACCOUNT</span>
-              </h6>
-              <div className="card-text">
-                <div className="card-text">
-                  {getApi?.isLoading ? (
-                    <Spinner />
-                  ) : (
-                    <p className="fw-bold display-6">
-                      {currency(
-                        getApi?.data?.balance?.currentBalanceOnOrphansAcc
-                      )}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

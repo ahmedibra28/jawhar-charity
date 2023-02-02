@@ -125,7 +125,9 @@ const Donor = () => {
               <tr>
                 <th>Donor</th>
                 <th>Account</th>
+                <th>Total Payment</th>
                 <th>Amount</th>
+                <th>Payment Status</th>
                 <th>Date</th>
                 <th>Description</th>
               </tr>
@@ -135,7 +137,25 @@ const Donor = () => {
                 <tr key={i}>
                   <td>{item?.donor?.name}</td>
                   <td>{item?.account}</td>
+                  <td>
+                    {item?.totalAmount ? (
+                      <span className="badge bg-success">
+                        {`${currency(item?.totalAmount)} for ${
+                          item?.duration
+                        } months`}
+                      </span>
+                    ) : (
+                      <span className="badge bg-danger">NA</span>
+                    )}
+                  </td>
                   <td>{currency(item?.amount)}</td>
+                  <td>
+                    {item?.isPaid ? (
+                      <span className="bg-success badge">Paid</span>
+                    ) : (
+                      <span className="bg-danger badge">Un-Paid</span>
+                    )}
+                  </td>
                   <td>{moment(item?.date).format('YYYY-MM-DD')}</td>
                   <td>{item?.description}</td>
                 </tr>

@@ -10,7 +10,7 @@ handler.use(isAuth)
 handler.post(
   async (req: NextApiRequestExtended, res: NextApiResponseExtended) => {
     try {
-      const { account, startDate, endDate } = req.body
+      const { account, startDate, endDate, transactionType } = req.body
 
       const start = moment(startDate).startOf('day')
       const end = moment(endDate).endOf('day')
@@ -33,6 +33,7 @@ handler.post(
       const transactions = await Transaction.find(
         {
           account,
+          transactionType,
           date: { $gte: start, $lte: end },
         },
         {
@@ -41,8 +42,12 @@ handler.post(
           date: 1,
           description: 1,
           transactionType: 1,
+          donor: 1,
         }
-      ).lean()
+      )
+        .lean()
+        .sort({ date: -1 })
+        .populate('donor', ['name'])
 
       res.json(transactions)
     } catch (error: any) {

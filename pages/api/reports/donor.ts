@@ -30,7 +30,7 @@ handler.post(
       const donorObj = await Donor.findOne({ name: donor })
       if (!donorObj) return res.status(404).json({ error: 'Donor not found' })
 
-      const transactions = await Transaction.find(
+      let transactions = await Transaction.find(
         {
           donor: donorObj._id,
           date: { $gte: start, $lte: end },
@@ -38,13 +38,21 @@ handler.post(
         {
           donor: 1,
           amount: 1,
+          totalAmount: 1,
           account: 1,
           date: 1,
           description: 1,
+          isPaid: 1,
         }
       )
         .lean()
         .populate('donor', ['name', 'mobile'])
+        .sort({ date: -1 })
+
+      transactions = transactions?.map((trans) => ({
+        ...trans,
+        duration: Math.round(trans?.totalAmount / trans.amount) || undefined,
+      }))
 
       res.json(transactions)
     } catch (error: any) {

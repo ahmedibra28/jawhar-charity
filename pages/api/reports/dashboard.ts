@@ -19,7 +19,7 @@ handler.get(
       const emptyArray = [...Array(12).keys()]
 
       const transactions = await Transaction.find(
-        { date: { $gte: startOfMonth, $lte: endOfMonth } },
+        { date: { $gte: startOfMonth, $lte: endOfMonth }, isPaid: true },
         { amount: 1, account: 1, transactionType: 1, date: 1 }
       ).lean()
 
@@ -82,6 +82,8 @@ handler.get(
         ramadan: emptyArray.map((n) => month(n, 'Ramadan'))?.reverse(),
         eid: emptyArray.map((n) => month(n, 'Eid'))?.reverse(),
         orphans: emptyArray.map((n) => month(n, 'Orphans'))?.reverse(),
+        education: emptyArray.map((n) => month(n, 'Education'))?.reverse(),
+        other: emptyArray.map((n) => month(n, 'Other'))?.reverse(),
 
         lastYear: lastYear(),
       }
@@ -91,6 +93,7 @@ handler.get(
           {
             $match: {
               transactionType: 'credit',
+              isPaid: true,
             },
           },
           {
@@ -138,6 +141,8 @@ handler.get(
       const currentBalanceOnEidAcc = await totalAccounts('Eid')
       const currentBalanceOnRamadanAcc = await totalAccounts('Ramadan')
       const currentBalanceOnOrphansAcc = await totalAccounts('Orphans')
+      const currentBalanceOnEducationAcc = await totalAccounts('Education')
+      const currentBalanceOnOtherAcc = await totalAccounts('Other')
 
       res.json({
         chartData,
@@ -145,6 +150,8 @@ handler.get(
           currentBalanceOnEidAcc,
           currentBalanceOnRamadanAcc,
           currentBalanceOnOrphansAcc,
+          currentBalanceOnEducationAcc,
+          currentBalanceOnOtherAcc,
         },
       })
     } catch (error: any) {

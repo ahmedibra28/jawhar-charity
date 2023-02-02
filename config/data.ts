@@ -131,11 +131,11 @@ const clientPermissions = [
   },
   {
     _id: '637e0261fadddf65baa85bbb',
-    name: 'Door Report',
+    name: 'Donor Report',
     path: '/reports/donor',
     menu: 'report',
     sort: sort.report,
-    description: 'Door Report page',
+    description: 'Donor Report page',
   },
   {
     _id: '637e0261fadddf65baa8bbbb',

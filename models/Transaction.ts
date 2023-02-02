@@ -7,10 +7,12 @@ export interface ITransaction {
   donor?: Schema.Types.ObjectId
   account: string
   amount: number
+  totalAmount: number
   date: Date
   reference: string
   description: string
   transactionType: string
+  isPaid?: boolean
 
   createdAt: Date
   createdBy: Schema.Types.ObjectId
@@ -21,6 +23,7 @@ const transactionSchema = new Schema<ITransaction>(
   {
     donor: { type: Schema.Types.ObjectId, ref: Donor },
     account: { type: String, required: true },
+    totalAmount: { type: Number },
     amount: { type: Number, required: true },
     date: { type: Date, default: new Date() },
     description: String,
@@ -30,6 +33,7 @@ const transactionSchema = new Schema<ITransaction>(
       default: 'credit',
     },
     reference: { type: String, required: true },
+    isPaid: { type: Boolean, default: true },
 
     createdBy: { type: Schema.Types.ObjectId, ref: User, required: true },
     updatedBy: { type: Schema.Types.ObjectId, ref: User },

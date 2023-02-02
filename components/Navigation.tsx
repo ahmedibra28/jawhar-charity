@@ -2,9 +2,16 @@ import React, { useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-import { FaSignInAlt, FaPowerOff, FaBars, FaUser } from 'react-icons/fa'
+import {
+  FaSignInAlt,
+  FaPowerOff,
+  FaBars,
+  FaUser,
+  FaFunnelDollar,
+} from 'react-icons/fa'
 import { IClientPermission } from '../models/ClientPermission'
 import useStore from '../zustand/useStore'
+import apiHook from '../api'
 // import apiHook from '../api'
 // import { useRouter } from 'next/router'
 
@@ -95,10 +102,31 @@ const Navigation = ({ toggle }: { toggle: () => void }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const postGenerateApi = apiHook({
+    key: ['generate'],
+    method: 'POST',
+    url: `payment-generate`,
+  })?.post
+
   const authItems = () => {
     return (
       <>
         <ul className="navbar-nav ms-auto">
+          <li className="nav-item my-auto">
+            <button
+              onClick={() => postGenerateApi?.mutateAsync({})}
+              disabled={postGenerateApi?.isLoading}
+              className="btn btn-primary text-light nav-link rounded-5 px-3 py-1"
+            >
+              {postGenerateApi?.isLoading ? (
+                <span className="spinner-border spinner-border-sm" />
+              ) : (
+                <>
+                  <FaFunnelDollar className="mb-1" /> Generate New Payment
+                </>
+              )}
+            </button>
+          </li>
           <li className="nav-item dropdown profile-dropdown dropstart profile-dropdown">
             <a
               className="nav-link dropdown-toggle"

@@ -47,7 +47,7 @@ const Account = () => {
           <form onSubmit={handleSubmit(submitHandler)} className="row">
             <div className="col-lg-8 col-12 mx-auto border py-3 px-4">
               <div className="row">
-                <div className="col-lg-4 col-md-4 col-12 mx-auto">
+                <div className="col-lg-3 col-md-6 col-12 mx-auto">
                   {staticInputSelect({
                     register,
                     errors,
@@ -57,7 +57,17 @@ const Account = () => {
                     data: accounts,
                   } as DynamicFormProps)}
                 </div>
-                <div className="col-lg-4 col-md-4 col-12 mx-auto">
+                <div className="col-lg-3 col-md-6 col-12 mx-auto">
+                  {staticInputSelect({
+                    register,
+                    errors,
+                    label: 'Transaction Type',
+                    name: 'transactionType',
+                    placeholder: 'Select transaction type',
+                    data: [{ name: 'credit' }, { name: 'debit' }],
+                  } as DynamicFormProps)}
+                </div>
+                <div className="col-lg-3 col-md-6 col-12 mx-auto">
                   {inputDate({
                     register,
                     errors,
@@ -66,7 +76,7 @@ const Account = () => {
                     placeholder: 'Start date',
                   } as DynamicFormProps)}
                 </div>
-                <div className="col-lg-4 col-md-4 col-12 mx-auto">
+                <div className="col-lg-3 col-md-6 col-12 mx-auto">
                   {inputDate({
                     register,
                     errors,
@@ -97,6 +107,10 @@ const Account = () => {
           <table className="table table-sm table-border mt-5">
             <thead className="border-0">
               <tr>
+                {postApi?.data?.[0]?.transactionType === 'credit' && (
+                  <th>Donor</th>
+                )}
+
                 <th>Account</th>
                 <th>Amount</th>
                 <th>Transaction Type</th>
@@ -107,6 +121,9 @@ const Account = () => {
             <tbody>
               {postApi?.data?.map((item: any, i: number) => (
                 <tr key={i}>
+                  {postApi?.data?.[0]?.transactionType === 'credit' && (
+                    <td>{item?.donor?.name}</td>
+                  )}
                   <td>{item?.account}</td>
                   <td>{currency(item?.amount)}</td>
                   <td>

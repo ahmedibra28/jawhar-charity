@@ -11,14 +11,17 @@ handler.use(isAuth)
 handler.get(
   async (req: NextApiRequestExtended, res: NextApiResponseExtended) => {
     try {
-      const q = req.query && req.query.q
-      let donor = []
+      const q = req.query.q
 
-      if (q) {
-        donor = await Donor.find({
-          $or: [{ name: { $regex: q, $options: 'i' }, mobile: q }],
+      const searchDonor = async (q: string) => {
+        const donor = await Donor.find({
+          name: { $regex: q, $options: 'i' },
         })
+
+        return donor
       }
+
+      const donor = q ? await searchDonor(q) : []
 
       let query = Transaction.find(
         donor?.length > 0
@@ -50,7 +53,12 @@ handler.get(
         .lean()
         .populate('donor', ['name'])
 
-      const result = await query
+      let result = await query
+
+      result = result?.map((trans) => ({
+        ...trans,
+        duration: Math.round(trans?.totalAmount / trans.amount) || undefined,
+      }))
 
       res.status(200).json({
         startIndex: skip + 1,
@@ -70,16 +78,17 @@ handler.get(
 handler.post(
   async (req: NextApiRequestExtended, res: NextApiResponseExtended) => {
     try {
-      const { donor, account, totalAmount, date, description } = req.body
-      const duration = req.body.duration || 1
+      const { donor, account, totalAmount, date, description, isPaid } =
+        req.body
+      let duration = req.body.duration || 1
+
+      if (!['Orphans', 'Education'].includes(account)) {
+        duration = 1
+      }
 
       const reference = uuidv4()
 
-      if (
-        Number(totalAmount) < 1 ||
-        Number(duration) < 1 ||
-        Number(totalAmount) === Number(duration)
-      )
+      if (Number(totalAmount) < 1 || Number(duration) < 1)
         return res
           .status(400)
           .json({ error: `Amount can't be a negative or zero.` })
@@ -95,11 +104,40 @@ handler.post(
       if (!accounts.map((acc) => acc.name).includes(account))
         return res.status(400).json({ error: 'Account is not found!' })
 
-      Promise.all(
+      const promiseCheck = Promise.all(
         Array(Number(duration))
           .fill(Number(totalAmount) / Number(duration))
           .map(async (amount, i: number) => {
-            await Transaction.create({
+            const startDate = moment(date).add(i, 'months').startOf('month')
+            const endDate = moment(date).add(i, 'months').endOf('month')
+
+            const newReceipt = await Transaction.findOne({
+              date: { $gte: startDate, $lte: endDate },
+              donor: checkDonor._id,
+              account,
+            })
+
+            if (newReceipt)
+              return res
+                .status(400)
+                .json({ error: `Donor has already donated on ${date} date` })
+
+            return 'ok'
+          })
+      )
+
+      const v = await promiseCheck
+      if (v.includes(undefined)) return
+
+      const createData = []
+
+      await Promise.all(
+        Array(Number(duration))
+          .fill(Number(totalAmount) / Number(duration))
+          .map(async (amount, i: number) => {
+            const newAmount = duration > 0 && i === 0 ? totalAmount : undefined
+
+            createData.push({
               donor: checkDonor._id,
               account,
               description:
@@ -108,15 +146,21 @@ handler.post(
                   checkDonor.name
                 } to ${account} at ${date}`,
               amount,
+              totalAmount: Number(newAmount) || undefined,
               transactionType: 'credit',
               date: moment(date || Date.now()).add(i, 'months'),
               reference,
+              isPaid,
               createdBy: req.user._id,
             })
           })
       )
-        .then(() => res.send('success'))
-        .catch(() => res.status(400).json({ error: 'Transaction error' }))
+
+      const create = await Transaction.insertMany(createData)
+      if (!create)
+        return res.status(400).json({ error: 'Error transaction creating' })
+
+      res.send(create)
     } catch (error: any) {
       res.status(500).json({ error: error.message })
     }
