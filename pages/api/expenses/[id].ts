@@ -28,6 +28,7 @@ handler.put(
         {
           $match: {
             transactionType: 'credit',
+            isPaid: true,
           },
         },
         {
@@ -73,7 +74,9 @@ handler.put(
         Number(totalCredit) - Number(totalDebit) + Number(object.amount) <
         Number(amount)
       )
-        return res.status(400).json({ error: `${account} sufficient funds` })
+        return res
+          .status(400)
+          .json({ error: `un-sufficient funds for ${account} account` })
 
       object.date = date
       object.description = description

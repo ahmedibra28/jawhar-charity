@@ -258,9 +258,7 @@ const Receipts = () => {
         {inputCheckBox({
           register,
           errors,
-          label: `Is ${
-            watch('donor') ? watch('donor') : 'this donor'
-          } paid in cash?`,
+          label: `Is paid in cash?`,
           name: 'isPaid',
           isRequired: false,
         } as DynamicFormProps)}

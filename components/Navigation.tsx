@@ -12,6 +12,8 @@ import {
 import { IClientPermission } from '../models/ClientPermission'
 import useStore from '../zustand/useStore'
 import apiHook from '../api'
+import Message from './Message'
+import moment from 'moment'
 // import apiHook from '../api'
 // import { useRouter } from 'next/router'
 
@@ -192,6 +194,15 @@ const Navigation = ({ toggle }: { toggle: () => void }) => {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
+          {postGenerateApi?.isSuccess && (
+            <Message
+              variant="success"
+              value={`Payment on ${moment().format(
+                'MMMM YYYY'
+              )} has been generated successfully`}
+            />
+          )}
+
           {userInfo ? authItems() : guestItems()}
         </div>
       </div>

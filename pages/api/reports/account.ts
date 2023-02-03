@@ -35,6 +35,8 @@ handler.post(
           account,
           transactionType,
           date: { $gte: start, $lte: end },
+          // isPaid: transactionType === 'credit' ? true : false,
+          ...(transactionType === 'credit' && { isPaid: true }),
         },
         {
           amount: 1,

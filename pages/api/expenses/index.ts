@@ -66,6 +66,7 @@ handler.post(
         {
           $match: {
             transactionType: 'credit',
+            isPaid: true,
           },
         },
         {
@@ -108,7 +109,9 @@ handler.post(
       const totalCredit = creditTransactions?.[0]?.amount || 0
 
       if (Number(totalCredit) - Number(totalDebit) < Number(amount))
-        return res.status(400).json({ error: `${account} sufficient funds` })
+        return res
+          .status(400)
+          .json({ error: `un-sufficient funds for ${account} account` })
 
       const obj = await Transaction.create({
         account,

@@ -11,7 +11,7 @@ handler.put(
   async (req: NextApiRequestExtended, res: NextApiResponseExtended) => {
     try {
       const { id } = req.query
-      const { account, totalAmount, date, description } = req.body
+      const { account, totalAmount, date, description, isPaid } = req.body
 
       if (Number(totalAmount) < 1)
         return res
@@ -44,6 +44,7 @@ handler.put(
       object.description = description
       object.account = account
       object.amount = totalAmount
+      object.isPaid = isPaid
       object.updatedBy = req.user._id
 
       await object.save()

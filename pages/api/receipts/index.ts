@@ -129,7 +129,7 @@ handler.post(
       const v = await promiseCheck
       if (v.includes(undefined)) return
 
-      const createData = []
+      const createData: any = []
 
       await Promise.all(
         Array(Number(duration))

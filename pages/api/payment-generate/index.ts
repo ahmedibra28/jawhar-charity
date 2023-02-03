@@ -1,12 +1,12 @@
 import nc from 'next-connect'
-// import { isAuth } from '../../../utils/auth'
+import { isAuth } from '../../../utils/auth'
 import Transaction from '../../../models/Transaction'
 import { v4 as uuidv4 } from 'uuid'
 import moment from 'moment'
 import Donor from '../../../models/Donor'
 
 const handler = nc()
-// handler.use(isAuth)
+handler.use(isAuth)
 
 handler.post(
   async (req: NextApiRequestExtended, res: NextApiResponseExtended) => {
@@ -43,29 +43,36 @@ handler.post(
 
       let donorsArray = [...donors1, ...donors2]
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       transactionsArray = transactionsArray?.map(
         (value) => `${value.donor}-${value.account}`
       )
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       donorsArray = donorsArray?.map(
         (value) => `${value.donor}-${value.account}`
       )
 
       const newValue = []
-      const result = []
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const result: any = []
 
-      donorsArray?.forEach((value) => {
+      donorsArray?.forEach((value: any) => {
         if (!transactionsArray?.includes(value)) {
           newValue.push(value)
           result.push({
             donor: value?.split('-')[0],
+
             account: value?.split('-')[1],
           })
         }
       })
 
-      const save = []
+      const save: any = []
       await Promise.all(
-        result?.map(async (value) => {
+        result?.map(async (value: any) => {
           save.push({
             donor: value?.donor,
             account: value?.account,
