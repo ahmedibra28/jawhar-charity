@@ -1,52 +1,43 @@
+'use client'
 import { useEffect, useState } from 'react'
-import { FaCheckCircle, FaTimes, FaTimesCircle } from 'react-icons/fa'
+import { FaCircleCheck, FaCircleXmark } from 'react-icons/fa6'
 
 interface Props {
-  variant: string
-  value: any
+  value: string | any
 }
 
-const Message = ({ variant, value }: Props) => {
+import { toast } from 'sonner'
+
+import { Toaster } from './ui/sonner'
+import DateTime from '@/lib/dateTime'
+
+const Message = ({ value = 'Internal Server Error!' }: Props) => {
   const [alert, setAlert] = useState(true)
 
   useEffect(() => {
+    toast.message(value, {
+      description: DateTime().format('ddd D MMM YYYY HH:mm:ss'),
+      action: {
+        label: 'Close',
+        onClick: () => {},
+      },
+    })
+
     const timeId = setTimeout(() => {
       setAlert(false)
-    }, 15000)
+    }, 10000)
 
     return () => {
       clearTimeout(timeId)
     }
+    // eslint-disable-next-line
   }, [alert])
 
   return (
     <>
       {alert && (
-        <div
-          className="container d-flex justify-content-center position-fixed top-0 start-0 end-0 mt-3 text-center animate__animated animate__lightSpeedInRights animate__fadeInDown"
-          style={{ zIndex: 900000, width: 'fit-content' }}
-        >
-          <div
-            className={`toast show text-${variant} border border-${variant} bg-light rounded-0`}
-            role="alert"
-          >
-            <div className="toast-body position-relative">
-              {variant === 'success' ? (
-                <FaCheckCircle className="fs-4 me-1 mb-1" />
-              ) : (
-                <FaTimesCircle className="fs-4 me-1 mb-1" />
-              )}
-              <br />
-              <span>{value}</span>
-              <div
-                onClick={() => setAlert(false)}
-                className="position-absolute bg-primary rounded-pill d-flex justify-content-center align-items-center"
-                style={{ right: -10, top: -10, width: 30, height: 30 }}
-              >
-                <FaTimes className="text-light" />
-              </div>
-            </div>
-          </div>
+        <div>
+          <Toaster position='top-right' className='bg-red-500' />
         </div>
       )}
     </>

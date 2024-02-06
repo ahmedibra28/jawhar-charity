@@ -1,4 +1,5 @@
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+'use client'
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
 
 interface Props {
   data: {
@@ -13,24 +14,24 @@ interface Props {
 
 const Pagination = ({ data, setPage }: Props) => {
   return data ? (
-    <div className="text-end my-1">
-      <span className="btn bg-light shadow">
+    <div className='text-end my-1'>
+      <span className='btn bg-white shadow'>
         {data.startIndex} - {data.endIndex} of {data.total}
       </span>
-      <span
+      <button
+        disabled={data.page === 1}
         onClick={() => setPage(data.page - 1)}
-        className={`btn bg-light shadow mx-1 ${data.page === 1 && 'disabled'}`}
+        className='btn bg-white shadow mx-1'
       >
-        <FaChevronLeft className="mb-1" />
-      </span>
-      <span
+        <FaChevronLeft className='mb-1' />
+      </button>
+      <button
+        disabled={data.page === data.pages}
         onClick={() => setPage(data.page + 1)}
-        className={`btn bg-light shadow ${
-          data.page === data.pages && 'disabled'
-        }`}
+        className='btn bg-white shadow'
       >
-        <FaChevronRight className="mb-1" />
-      </span>
+        <FaChevronRight className='mb-1' />
+      </button>
     </div>
   ) : null
 }

@@ -1,212 +1,191 @@
-import React, { useEffect } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
+'use client'
+import useUserInfoStore from '@/zustand/userStore'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
+import React, { Fragment } from 'react'
+import { FaBars, FaPowerOff } from 'react-icons/fa6'
+
 import {
-  FaSignInAlt,
-  FaPowerOff,
-  FaBars,
-  FaUser,
-  FaFunnelDollar,
-} from 'react-icons/fa'
-import { IClientPermission } from '../models/ClientPermission'
-import useStore from '../zustand/useStore'
-import apiHook from '../api'
-import Message from './Message'
-import moment from 'moment'
-// import apiHook from '../api'
-// import { useRouter } from 'next/router'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarTrigger,
+  MenubarPortal,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
+} from '@/components/ui/menubar'
 
-const Logout = () => {
-  typeof window !== undefined && localStorage.removeItem('userRole')
-  return typeof window !== undefined && localStorage.removeItem('userInfo')
-}
+const Navigation = () => {
+  const { userInfo } = useUserInfoStore((state) => state)
+  const [menu, setMenu] = React.useState<any>(userInfo.menu)
 
-const Navigation = ({ toggle }: { toggle: () => void }) => {
-  const { userInfo, logout } = useStore((state) => state) as {
-    userInfo: any
-    logout: () => void
-  }
-  // const { route } = useRouter()
-
-  // const getApi = apiHook({
-  //   key: ['routes'],
-  //   method: 'GET',
-  //   url: `auth/client-permissions/routes?id=${userInfo?._id}`,
-  // })?.get
-
-  // useEffect(() => {
-  //   if (getApi?.isSuccess && userInfo) {
-  //     typeof window !== undefined &&
-  //       localStorage.setItem(
-  //         'userInfo',
-  //         JSON.stringify({
-  //           ...userInfo,
-  //           role: getApi?.data?.role,
-  //           routes: getApi?.data?.routes,
-  //         })
-  //       )
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [getApi?.isSuccess, route])
-
-  const logoutHandler = () => {
-    Logout()
-    logout()
+  const handleLogout = () => {
+    useUserInfoStore.getState().logout()
   }
 
-  const guestItems = () => {
-    return (
-      <>
-        <ul className="navbar-nav ms-auto">
-          <li className="nav-item">
-            <Link href="/auth/login" className="nav-link" aria-current="page">
-              <FaSignInAlt className="mb-1" /> Login
-            </Link>
-          </li>
-        </ul>
-      </>
-    )
-  }
-
-  const menus = () => {
-    const dropdownItems = userInfo?.routes?.map((route: IClientPermission) => ({
-      menu: route.menu,
-      sort: route.sort,
-    }))
-
-    const menuItems = userInfo?.routes?.map((route: IClientPermission) => route)
-
-    const dropdownArray = dropdownItems?.filter(
-      (item: IClientPermission) =>
-        item?.menu !== 'hidden' && item?.menu !== 'normal'
-    )
-
-    const uniqueDropdowns = dropdownArray?.reduce((a: any[], b: any) => {
-      const i = a.findIndex((x: IClientPermission) => x.menu === b.menu)
-      return (
-        i === -1 ? a.push({ menu: b.menu, ...b, times: 1 }) : a[i].times++, a
-      )
-    }, [])
-
-    return {
-      uniqueDropdowns: uniqueDropdowns?.sort(
-        (a: { sort: number }, b: { sort: number }) => b?.sort - a?.sort
-      ),
-      menuItems: menuItems?.sort(
-        (a: { sort: number }, b: { sort: number }) => b?.sort - a?.sort
-      ),
+  React.useEffect(() => {
+    const label = document.querySelector(`[data-drawer-target="bars"]`)
+    if (userInfo.id) {
+      setMenu(userInfo.menu)
+      label?.classList.remove('hidden')
+    } else {
+      label?.classList.add('hidden')
     }
+  }, [userInfo])
+
+  const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1)
   }
 
-  useEffect(() => {
-    menus()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const auth = (
+    <>
+      <div className='hidden lg:block flex-row'>
+        <ul className='px-1 flex space-x-4 items-center'>
+          {menu.map((item: any, i: number) => (
+            <Fragment key={i}>
+              {!item?.children && <Link href={item.path}>{item.name}</Link>}
 
-  const postGenerateApi = apiHook({
-    key: ['generate'],
-    method: 'POST',
-    url: `payment-generate`,
-  })?.post
-
-  const authItems = () => {
-    return (
-      <>
-        <ul className="navbar-nav ms-auto">
-          <li className="nav-item my-auto">
-            <button
-              onClick={() => postGenerateApi?.mutateAsync({})}
-              disabled={postGenerateApi?.isLoading}
-              className="btn btn-primary text-light nav-link rounded-5 px-3 py-1"
-            >
-              {postGenerateApi?.isLoading ? (
-                <span className="spinner-border spinner-border-sm" />
-              ) : (
-                <>
-                  <FaFunnelDollar className="mb-1" /> Generate New Payment
-                </>
+              {item?.children && (
+                <DropdownMenu key={item.name}>
+                  <DropdownMenuTrigger className='outline-none'>
+                    {capitalizeFirstLetter(item.name)}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className='hidden lg:block'>
+                    {item.children.map((child: any, i: number) => (
+                      <DropdownMenuItem key={i}>
+                        <Link href={child.path} className='justify-between'>
+                          {child.name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
-            </button>
-          </li>
-          <li className="nav-item dropdown profile-dropdown dropstart profile-dropdown">
-            <a
-              className="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <Image
-                src="https://github.com/ahmaat19.png"
-                alt="Ahmed"
-                className="rounded-pill me-1"
-                width={30}
-                height={30}
-              />
-            </a>
-            <ul className="dropdown-menu border-0 shadow-lg">
-              <li>
-                <Link
-                  href="/account/profile"
-                  className="dropdown-item"
-                  aria-current="page"
-                >
-                  <FaUser className="mb-1" /> {userInfo?.name}
+            </Fragment>
+          ))}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger className='outline-none'>
+              <Avatar>
+                <AvatarImage
+                  src={
+                    userInfo.image ||
+                    `https://ui-avatars.com/api/?uppercase=true&name=${userInfo?.name}`
+                  }
+                />
+                <AvatarFallback>AI</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className='hidden lg:block'>
+              <DropdownMenuItem>
+                <Link href='/account/profile' className='justify-between'>
+                  Profile
                 </Link>
-              </li>
-              <li>
-                <Link
-                  href="/auth/login"
-                  className="dropdown-item"
-                  aria-current="page"
-                  onClick={logoutHandler}
-                >
-                  <FaPowerOff className="mb-1" /> Logout
-                </Link>
-              </li>
-            </ul>
-          </li>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <button onClick={() => handleLogout()}>
+                  <Link
+                    href='/auth/login'
+                    className='flex justify-start items-center flex-row gap-x-1 text-red-500'
+                  >
+                    <FaPowerOff /> <span>Logout</span>
+                  </Link>
+                </button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </ul>
-      </>
-    )
-  }
+      </div>
+
+      <div className='lg:hidden'>
+        <Menubar className='border-none lg:hidden'>
+          <MenubarMenu>
+            <MenubarTrigger>
+              <FaBars className='text-gray-500 text-2xl' />
+            </MenubarTrigger>
+            <MenubarContent className='lg:hidden'>
+              <ul>
+                <MenubarItem>
+                  <Link href='/account/profile' className='justify-between'>
+                    Profile
+                  </Link>
+                </MenubarItem>
+                {menu.map((item: any, i: number) => (
+                  <Fragment key={i}>
+                    {!item?.children && (
+                      <MenubarItem>
+                        <Link href={item.path}>{item.name}</Link>
+                      </MenubarItem>
+                    )}
+
+                    {item?.children && (
+                      <MenubarSub key={item.name}>
+                        <MenubarSubTrigger className='px-2 py-1.5 text-sm flex flex-row items-center outline-none'>
+                          {capitalizeFirstLetter(item.name)}
+                        </MenubarSubTrigger>
+                        <MenubarPortal>
+                          <MenubarSubContent className='bg-white p-1 rounded-md border border-gray-200 w-auto z-50 lg:hidden'>
+                            {item.children.map((child: any, i: number) => (
+                              <MenubarItem key={i}>
+                                <Link
+                                  href={child.path}
+                                  className='justify-between'
+                                >
+                                  {child.name}
+                                </Link>
+                              </MenubarItem>
+                            ))}
+                          </MenubarSubContent>
+                        </MenubarPortal>
+                      </MenubarSub>
+                    )}
+                  </Fragment>
+                ))}
+
+                <MenubarSeparator />
+                <MenubarItem>
+                  <li>
+                    <button onClick={() => handleLogout()}>
+                      <Link
+                        href='/auth/login'
+                        className='flex justify-start items-center flex-row gap-x-1 text-red-500'
+                      >
+                        <FaPowerOff /> <span>Logout</span>
+                      </Link>
+                    </button>
+                  </li>
+                </MenubarItem>
+              </ul>
+            </MenubarContent>
+          </MenubarMenu>
+        </Menubar>
+      </div>
+    </>
+  )
 
   return (
-    <nav
-      className="navbar navbar-expand-md navbar-light bg-light position-fixed w-100"
-      style={{ minHeight: 55, zIndex: 1 }}
-    >
-      <div className="container-fluid">
-        {/* {userInfo && <FaBars onClick={toggle} className="fs-5 ms-1s" />} */}
-
-        <FaBars onClick={userInfo && toggle} className="fs-5 ms-1s" />
-
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
-          {postGenerateApi?.isSuccess && (
-            <Message
-              variant="success"
-              value={`Payment on ${moment().format(
-                'MMMM YYYY'
-              )} has been generated successfully`}
-            />
-          )}
-
-          {userInfo ? authItems() : guestItems()}
-        </div>
-      </div>
-    </nav>
+    <div className='flex-none'>
+      <ul className='px-1 w-full'>
+        {!userInfo.id && (
+          <li>
+            <Link href='/auth/login'>Login</Link>
+          </li>
+        )}
+      </ul>
+      {userInfo.id && auth}
+    </div>
   )
 }
 

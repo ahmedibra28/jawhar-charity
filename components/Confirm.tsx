@@ -1,26 +1,36 @@
+'use client'
+
+import React from 'react'
 import 'react-confirm-alert/src/react-confirm-alert.css'
-import { FaTrash } from 'react-icons/fa'
+import { FaTrash } from 'react-icons/fa6'
+import { Button } from './ui/button'
 
 const Confirm = (action: () => void) => {
   return {
     customUI: ({ onClose }: { onClose: () => void }) => {
       return (
-        <div className="px-5 py-3 shadow-lg text-center text-dark">
-          <h1>Are you sure?</h1>
-          <p>You want to delete this?</p>
-          <div className="btn-group d-flex justify-content-between">
-            <button className="btn btn-outline-dark bg-sm" onClick={onClose}>
+        <div className='p-5 shadow-2xl text-center text-dark w-auto md:w-96 min-w-6xl border border-gray-500 rounded-lg'>
+          <h1 className='font-bold text-lg'>Are you sure?</h1>
+          <p className='mb-5'>You want to delete this?</p>
+          <div className='flex justify-around items-center mt-2'>
+            <Button
+              tabIndex={0}
+              className='btn text-white bg-green-500'
+              onClick={onClose}
+            >
               No
-            </button>
-            <button
-              className="btn btn-outline-danger bg-sm ml-1"
+            </Button>
+
+            <Button
+              tabIndex={0}
+              className='btn text-white bg-red-500'
               onClick={() => {
                 action()
                 onClose()
               }}
             >
-              <FaTrash className="mb-1" /> Yes, Delete it!
-            </button>
+              <FaTrash className='mr-1' /> Yes, Delete it!
+            </Button>
           </div>
         </div>
       )

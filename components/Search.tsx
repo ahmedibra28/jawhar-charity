@@ -1,30 +1,36 @@
+'use client'
 import { FormEvent } from 'react'
-import { FaSearch } from 'react-icons/fa'
+import { FaMagnifyingGlass } from 'react-icons/fa6'
+import { Input } from '@/components/ui/input'
+import { Button } from './ui/button'
 
 interface Props {
   q: string
   setQ: (value: string) => void
   placeholder: string
   searchHandler: (e: FormEvent) => void
+  type?: string
 }
 
-const Search = ({ q, setQ, placeholder, searchHandler }: Props) => {
+const Search = ({
+  q,
+  setQ,
+  placeholder,
+  searchHandler,
+  type = 'text',
+}: Props) => {
   return (
     <form onSubmit={searchHandler}>
-      <div className="input-group">
-        <input
-          type="text"
-          className="form-control"
-          placeholder={placeholder}
-          aria-label="Search"
+      <div className='flex w-full max-w-sm items-center space-x-2'>
+        <Input
           onChange={(e) => setQ(e.target.value)}
           value={q}
+          type={type}
+          placeholder={placeholder}
         />
-        <div className="input-group-append">
-          <button type="submit" className="btn btn-outline-secondary">
-            <FaSearch />
-          </button>
-        </div>
+        <Button type='submit'>
+          <FaMagnifyingGlass />
+        </Button>
       </div>
     </form>
   )

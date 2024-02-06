@@ -1,88 +1,67 @@
-import { FaPaperPlane, FaTimesCircle } from 'react-icons/fa'
+'use client'
+
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from './ui/button'
+import { FormButton } from './ui/CustomForm'
+import React from 'react'
+import useDataStore from '@/zustand/dataStore'
 
 interface Props {
-  edit: boolean
-  formCleanHandler: () => void
   form: any
-  isLoadingUpdate?: boolean
-  isLoadingPost?: boolean
+  loading?: boolean
   handleSubmit: (data: any) => () => void
   submitHandler: (data: any) => void
-  modal: string
   label: string
-  modalSize: string
+  height?: string
+  width?: string
+  edit: boolean
 }
 
 const FormView = ({
-  edit,
-  formCleanHandler,
   form,
-  isLoadingUpdate,
-  isLoadingPost,
+  loading,
   handleSubmit,
   submitHandler,
-  modal,
   label,
-  modalSize,
+  height,
+  width,
+  edit,
 }: Props) => {
-  return (
-    <div
-      className="modal fade"
-      id={modal}
-      data-bs-backdrop="static"
-      data-bs-keyboard="false"
-      tabIndex={-1}
-      aria-labelledby={`${modal}Label`}
-      aria-hidden="true"
-    >
-      <div className={`modal-dialog ${modalSize}`}>
-        <div className="modal-content modal-background">
-          <div className="modal-header">
-            <h3 className="modal-title " id={`${modal}Label`}>
-              {edit ? `Edit ${label}` : `Post ${label}`}
-            </h3>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              onClick={formCleanHandler}
-            ></button>
-          </div>
-          <div className="modal-body">
-            <form onSubmit={handleSubmit(submitHandler)}>
-              <div className="row">{form}</div>
+  const { dialogOpen, setDialogOpen } = useDataStore((state) => state)
 
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                  onClick={formCleanHandler}
-                >
-                  <>
-                    <FaTimesCircle className="mb-1" /> Close
-                  </>
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary "
-                  disabled={isLoadingPost || isLoadingUpdate}
-                >
-                  {isLoadingPost || isLoadingUpdate ? (
-                    <span className="spinner-border spinner-border-sm" />
-                  ) : (
-                    <>
-                      <FaPaperPlane className="mb-1" /> Submit
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+  return (
+    <Dialog open={dialogOpen} onOpenChange={() => setDialogOpen(false)}>
+      <DialogContent className={`${height} ${width} overflow-y-auto`}>
+        <DialogHeader>
+          <DialogTitle>
+            {edit ? 'Edit' : 'Add New'} {label}
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(submitHandler)} method='dialog'>
+          {form}
+          <DialogFooter className='mt-4 gap-y-2'>
+            <DialogClose asChild>
+              <Button type='button' variant='secondary' id='dialog-close'>
+                Close
+              </Button>
+            </DialogClose>
+
+            <FormButton
+              loading={loading}
+              type='submit'
+              label={edit ? 'Save edited changes' : 'Save changes'}
+            />
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
 

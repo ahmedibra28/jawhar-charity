@@ -1,9 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { IUser } from './models/User'
+import { NextRequest } from 'next/server'
+import { PrismaClient } from '@prisma/client'
 
 declare global {
-  // eslint-disable-next-line no-var
   var mongoose: any
+  var prisma: PrismaClient
   namespace NodeJS {
     interface ProcessEnv {
       NODE_ENV: string
@@ -15,11 +17,15 @@ declare global {
       SMTP_KEY: string
     }
   }
-  interface NextApiRequestExtended extends NextApiRequest {
-    user: IUser
-    url: any
-    // method: GET | POST | DELETE | PUT
-    files: { file: string }
+  interface NextApiRequestExtended extends Request {
+    user: {
+      id: string
+      name: string
+      email: string
+      role: string
+    }
+    url: string
+    method: 'GET' | 'POST' | 'DELETE' | 'PUT'
     query: {
       limit: string
       page: string
@@ -27,9 +33,10 @@ declare global {
       id: string
       secret: string
       type: string
+      option: string
     }
   }
-  interface NextApiResponseExtended extends NextApiResponse {
+  interface NextApiResponseExtended extends NextRequest {
     Data: any
   }
 }
