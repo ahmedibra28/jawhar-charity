@@ -26,6 +26,8 @@ import { FormatNumber } from '@/components/FormatNumber'
 import getLastTenDepositTransactions from '@/actions/getLastTenDepositTransactions'
 import getLastTenExpenseTransactions from '@/actions/getLastTenExpenseTransactions'
 import getLastTenHighestBalanceDonors from '@/actions/getLastTenHighestBalanceDonors'
+import useAuthorization from '@/hooks/useAuthorization'
+import { useRouter } from 'next/navigation'
 
 interface AccountProp {
   name: string
@@ -67,6 +69,15 @@ export default function Home() {
     React.useState<LastTenHighestBalanceDonorsProp[]>([])
 
   const [isPending, startTransition] = React.useTransition()
+
+  const path = useAuthorization()
+  const router = useRouter()
+
+  React.useEffect(() => {
+    if (path) {
+      router.push(path)
+    }
+  }, [path, router])
 
   React.useEffect(() => {
     startTransition(() => {
