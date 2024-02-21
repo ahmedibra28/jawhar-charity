@@ -28,6 +28,11 @@ import getLastTenExpenseTransactions from '@/actions/getLastTenExpenseTransactio
 import getLastTenHighestBalanceDonors from '@/actions/getLastTenHighestBalanceDonors'
 import useAuthorization from '@/hooks/useAuthorization'
 import { useRouter } from 'next/navigation'
+import DateTime from '@/lib/dateTime'
+import { Button } from '@/components/ui/button'
+import { FaCog } from 'react-icons/fa'
+import generateExpenses from '@/actions/generateExpenses'
+import useUserInfoStore from '@/zustand/userStore'
 
 interface AccountProp {
   name: string
@@ -49,6 +54,9 @@ interface LastTenExpenseTransactionProp {
   amount: number
   description: string
   account: {
+    name: string
+  }
+  createdBy: {
     name: string
   }
 }
@@ -113,9 +121,39 @@ export default function Home() {
     // eslint-disable-next-line
   }, [])
 
+  const { userInfo } = useUserInfoStore((state) => state)
+
+  const generateExpense = () => {
+    startTransition(() => {
+      generateExpenses({ payee: userInfo.id }).then((res) => res)
+      window.location.reload()
+    })
+  }
+
   return (
     <div className='p-2'>
       <TopLoadingBar isFetching={isPending} />
+
+      <Card className='mb-4'>
+        <CardHeader>
+          <CardTitle>Generate Expense</CardTitle>
+          <CardDescription>
+            Generate{' '}
+            <span className='font-bold'>
+              {DateTime(new Date()).format('MMM YYYY')}
+            </span>{' '}
+            expense
+            <br />
+            <span className='font-bold'>Note: </span>
+            <span>Your name will be used as the payee name</span>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={generateExpense} className='gap-x-2'>
+            <FaCog /> Generate
+          </Button>
+        </CardContent>
+      </Card>
 
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
         {isPending ? (
@@ -177,7 +215,7 @@ export default function Home() {
               <TableCaption>Last 10 expense transactions</TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Donor</TableHead>
+                  <TableHead>Payee</TableHead>
                   <TableHead>Account</TableHead>
                   <TableHead>Amount</TableHead>
                 </TableRow>
@@ -185,7 +223,7 @@ export default function Home() {
               <TableBody>
                 {lastTenExpenseTransactions?.map((transaction, i) => (
                   <TableRow key={i}>
-                    <TableCell>System</TableCell>
+                    <TableCell>{transaction?.createdBy?.name}</TableCell>
                     <TableCell>{transaction?.account?.name}</TableCell>
                     <TableCell className='text-red-500'>
                       -<FormatNumber value={transaction.amount} />

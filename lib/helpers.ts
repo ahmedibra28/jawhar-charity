@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import { S3Client } from '@aws-sdk/client-s3'
 
 export function getEnvVariable(key: string): string {
   const value = process.env[key]
@@ -13,6 +14,19 @@ export function getEnvVariable(key: string): string {
 
   return value
 }
+
+export const s3Client = new S3Client({
+  endpoint: getEnvVariable('AWS_DO_ENDPOINT'),
+  forcePathStyle: true,
+  region: 'us-east-1',
+  credentials: {
+    accessKeyId: getEnvVariable('AWS_DO_ACCESS_KEY_ID'),
+    secretAccessKey: getEnvVariable('AWS_DO_ACCESS_KEY'),
+  } as {
+    accessKeyId: string
+    secretAccessKey: string
+  },
+})
 
 export function getErrorResponse(
   error: string | null = null,

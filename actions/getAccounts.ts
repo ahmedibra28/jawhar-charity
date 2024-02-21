@@ -13,6 +13,7 @@ export default async function getAccounts() {
         balance: true,
         description: true,
       },
+      orderBy: [{ balance: 'desc' }],
     })
 
     return accounts

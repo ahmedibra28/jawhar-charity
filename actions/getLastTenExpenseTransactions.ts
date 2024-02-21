@@ -18,9 +18,14 @@ export default async function getLastTenExpenseTransactions() {
             name: true,
           },
         },
+        createdBy: {
+          select: {
+            name: true,
+          },
+        },
       },
       take: 10,
-      orderBy: [{ activeAt: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ createdAt: 'desc' }, { activeAt: 'desc' }],
     })
 
     return transactions

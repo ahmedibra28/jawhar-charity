@@ -12,12 +12,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Form } from '@/components/ui/form'
 import CustomFormField, { FormButton } from '@/components/ui/CustomForm'
-import generateExpenses from '@/actions/generateExpenses'
 
 const Page = () => {
   const router = useRouter()
   const params = useSearchParams().get('next')
-  const [isPending, startTransition] = React.useTransition()
 
   const { userInfo, updateUserInfo } = useUserInfoStore((state) => state)
 
@@ -68,14 +66,6 @@ const Page = () => {
     postApi?.mutateAsync(values)
   }
 
-  React.useEffect(() => {
-    startTransition(() => {
-      generateExpenses().then((res) => res)
-    })
-
-    // eslint-disable-next-line
-  }, [])
-
   return (
     <FormContainer title='Sign In'>
       {postApi?.isError && <Message value={postApi?.error} />}
@@ -97,7 +87,7 @@ const Page = () => {
           />
 
           <FormButton
-            loading={postApi?.isPending || isPending}
+            loading={postApi?.isPending}
             label='Sign In'
             className='w-full'
           />

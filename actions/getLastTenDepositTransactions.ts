@@ -25,7 +25,7 @@ export default async function getLastTenDepositTransactions() {
         },
       },
       take: 10,
-      orderBy: [{ activeAt: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ createdAt: 'desc' }, { activeAt: 'desc' }],
     })
 
     return transactions
